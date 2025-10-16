@@ -1,0 +1,7 @@
+﻿using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+
+[assembly: AssemblyTitle("profinet")]
+[assembly: ComVisible(false)]
+[assembly: Guid("ec7eaa0a-e2c3-4ecc-99c3-a9f684529d6d")]

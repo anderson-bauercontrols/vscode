@@ -1,0 +1,507 @@
+#region Assembly LanguageServer, Version=7.0.0.0, Culture=neutral, PublicKeyToken=null
+// G:\.packages\languageserverprotocol\7.0.0\lib\netstandard1.3\LanguageServer.dll
+// Decompiled with ICSharpCode.Decompiler 8.1.1.7464
+#endregion
+
+using System;
+using System.IO;
+using System.Threading;
+using LanguageServer.Client;
+using LanguageServer.Parameters;
+using LanguageServer.Parameters.General;
+using LanguageServer.Parameters.TextDocument;
+using LanguageServer.Parameters.Workspace;
+
+namespace LanguageServer;
+
+public abstract class ServiceConnection : Connection
+{
+   private readonly Proxy _proxy;
+
+   private AsyncLocal<CancellationToken> _token = new AsyncLocal<CancellationToken>();
+
+   public Proxy Proxy => _proxy;
+
+   public CancellationToken CancellationToken
+   {
+      get
+      {
+         return _token.Value;
+      }
+      internal set
+      {
+         _token.Value = value;
+      }
+   }
+
+   protected ServiceConnection(Stream input, Stream output)
+      : base(input, output)
+   {
+      _proxy = new Proxy(this);
+      new ConnectionHandlerProvider().AddHandlers(base.RequestHandlers, base.NotificationHandlers, GetType());
+   }
+
+//   [JsonRpcMethod("initialize")]
+//   protected virtual Result<InitializeResult, ResponseError<InitializeErrorData>> Initialize(InitializeParams @params)
+//   {
+//      throw new NotImplementedException();
+//   }
+
+   [JsonRpcMethod("initialized")]
+   protected virtual void Initialized()
+   {
+   }
+
+//   [JsonRpcMethod("shutdown")]
+//   protected virtual VoidResult<ResponseError> Shutdown()
+//   {
+//      throw new NotImplementedException();
+//   }
+
+   [JsonRpcMethod("exit")]
+   protected virtual void Exit()
+   {
+   }
+
+   //
+   // Summary:
+   //     The workspace/didChangeWorkspaceFolders notification is sent from the client
+   //     to the server to inform the server about workspace folder configuration changes.
+   //
+   //
+   // Parameters:
+   //   params:
+   //
+   // Remarks:
+   //     The notification is sent by default if both ServerCapabilities/workspace/workspaceFolders
+   //     and ClientCapabilities/workspace/workspaceFolders are true; or if the server
+   //     has registered to receive this notification it first.
+   //
+   //     To register for the workspace/didChangeWorkspaceFolders send a client/registerCapability
+   //     request from the client to the server. The registration parameter must have a
+   //     registrations item of the following form, where id is a unique id used to unregister
+   //     the capability (the example uses a UUID):
+   //
+   //     {
+   //     id: "28c6150c-bd7b-11e7-abc4-cec278b6b50a",
+   //     method: "workspace/didChangeWorkspaceFolders"
+   //     }
+   [JsonRpcMethod("workspace/didChangeWorkspaceFolders")]
+   protected virtual void DidChangeWorkspaceFolders(DidChangeWorkspaceFoldersParams @params)
+   {
+   }
+
+//   [JsonRpcMethod("workspace/didChangeConfiguration")]
+//   protected virtual void DidChangeConfiguration(DidChangeConfigurationParams @params)
+//   {
+//   }
+
+//   [JsonRpcMethod("workspace/didChangeWatchedFiles")]
+//   protected virtual void DidChangeWatchedFiles(DidChangeWatchedFilesParams @params)
+//   {
+//   }
+
+   [JsonRpcMethod("workspace/symbol")]
+   protected virtual Result<SymbolInformation[], ResponseError> Symbol(WorkspaceSymbolParams @params)
+   {
+      throw new NotImplementedException();
+   }
+
+   [JsonRpcMethod("workspace/executeCommand")]
+   protected virtual Result<dynamic, ResponseError> ExecuteCommand(ExecuteCommandParams @params)
+   {
+      throw new NotImplementedException();
+   }
+
+//   [JsonRpcMethod("textDocument/didOpen")]
+//   protected virtual void DidOpenTextDocument(DidOpenTextDocumentParams @params)
+//   {
+//   }
+
+//   [JsonRpcMethod("textDocument/didChange")]
+//   protected virtual void DidChangeTextDocument(DidChangeTextDocumentParams @params)
+//   {
+//   }
+
+   [JsonRpcMethod("textDocument/willSave")]
+   protected virtual void WillSaveTextDocument(WillSaveTextDocumentParams @params)
+   {
+   }
+
+   [JsonRpcMethod("textDocument/willSaveWaitUntil")]
+   protected virtual Result<TextEdit[], ResponseError> WillSaveWaitUntilTextDocument(WillSaveTextDocumentParams @params)
+   {
+      throw new NotImplementedException();
+   }
+
+   [JsonRpcMethod("textDocument/didSave")]
+   protected virtual void DidSaveTextDocument(DidSaveTextDocumentParams @params)
+   {
+   }
+
+//   [JsonRpcMethod("textDocument/didClose")]
+//   protected virtual void DidCloseTextDocument(DidCloseTextDocumentParams @params)
+//   {
+//   }
+
+   //
+   // Summary:
+   //     The Completion request is sent from the client to the server to compute completion
+   //     items at a given cursor position.
+   //
+   // Parameters:
+   //   params:
+   //
+   // Remarks:
+   //     Completion items are presented in the IntelliSense user interface. If computing
+   //     full completion items is expensive, servers can additionally provide a handler
+   //     for the completion item resolve request (completionItem/resolve).
+   //
+   //     This request is sent when a completion item is selected in the user interface.
+   //
+   //
+   //     A typical use case is for example: the textDocument/completion request doesn’t
+   //     fill in the documentation property for returned completion items since it is
+   //     expensive to compute. When the item is selected in the user interface then a
+   //     completionItem/resolve request is sent with the selected completion item as a
+   //     param.
+   //
+   //     Registration Options: CompletionRegistrationOptions
+//   [JsonRpcMethod("textDocument/completion")]
+//   protected virtual Result<CompletionResult, ResponseError> Completion(CompletionParams @params)
+//   {
+//      throw new NotImplementedException();
+//   }
+
+//   [JsonRpcMethod("completionItem/resolve")]
+//   protected virtual Result<CompletionItem, ResponseError> ResolveCompletionItem(CompletionItem @params)
+//   {
+//      throw new NotImplementedException();
+//   }
+
+   [JsonRpcMethod("textDocument/hover")]
+   protected virtual Result<Hover, ResponseError> Hover(TextDocumentPositionParams @params)
+   {
+      throw new NotImplementedException();
+   }
+
+   [JsonRpcMethod("textDocument/signatureHelp")]
+   protected virtual Result<SignatureHelp, ResponseError> SignatureHelp(TextDocumentPositionParams @params)
+   {
+      throw new NotImplementedException();
+   }
+
+   [JsonRpcMethod("textDocument/references")]
+   protected virtual Result<Location[], ResponseError> FindReferences(ReferenceParams @params)
+   {
+      throw new NotImplementedException();
+   }
+
+   [JsonRpcMethod("textDocument/documentHighlight")]
+   protected virtual Result<DocumentHighlight[], ResponseError> DocumentHighlight(TextDocumentPositionParams @params)
+   {
+      throw new NotImplementedException();
+   }
+
+   //
+   // Summary:
+   //     The document symbol request is sent from the client to the server to return a
+   //     flat list of all symbols found in a given text document.
+   //
+   // Parameters:
+   //   params:
+   //
+   // Remarks:
+   //     Neither the symbol’s location range nor the symbol’s container name should be
+   //     used to infer a hierarchy.
+   //
+   //     Registration Options: TextDocumentRegistrationOptions
+   [JsonRpcMethod("textDocument/documentSymbol")]
+   protected virtual Result<DocumentSymbolResult, ResponseError> DocumentSymbols(DocumentSymbolParams @params)
+   {
+      throw new NotImplementedException();
+   }
+
+   //
+   // Summary:
+   //     The document color request is sent from the client to the server to list all
+   //     color references found in a given text document. Along with the range, a color
+   //     value in RGB is returned.
+   //
+   // Parameters:
+   //   params:
+   //
+   // Remarks:
+   //     Clients can use the result to decorate color references in an editor. For example:
+   //
+   //
+   //     • Color boxes showing the actual color next to the reference
+   //     • Show a color picker when a color reference is edited
+   [JsonRpcMethod("textDocument/documentColor")]
+   protected virtual Result<ColorInformation[], ResponseError> DocumentColor(DocumentColorParams @params)
+   {
+      throw new NotImplementedException();
+   }
+
+   //
+   // Summary:
+   //     The color presentation request is sent from the client to the server to obtain
+   //     a list of presentations for a color value at a given location.
+   //
+   // Parameters:
+   //   params:
+   //
+   // Remarks:
+   //     Clients can use the result to
+   //
+   //     • modify a color reference.
+   //     • show in a color picker and let users pick one of the presentations
+   [JsonRpcMethod("textDocument/colorPresentation")]
+   protected virtual Result<ColorPresentation[], ResponseError> ColorPresentation(ColorPresentationParams @params)
+   {
+      throw new NotImplementedException();
+   }
+
+   [JsonRpcMethod("textDocument/formatting")]
+   protected virtual Result<TextEdit[], ResponseError> DocumentFormatting(DocumentFormattingParams @params)
+   {
+      throw new NotImplementedException();
+   }
+
+   [JsonRpcMethod("textDocument/rangeFormatting")]
+   protected virtual Result<TextEdit[], ResponseError> DocumentRangeFormatting(DocumentRangeFormattingParams @params)
+   {
+      throw new NotImplementedException();
+   }
+
+   [JsonRpcMethod("textDocument/onTypeFormatting")]
+   protected virtual Result<TextEdit[], ResponseError> DocumentOnTypeFormatting(DocumentOnTypeFormattingParams @params)
+   {
+      throw new NotImplementedException();
+   }
+
+   //
+   // Summary:
+   //     The goto definition request is sent from the client to the server to resolve
+   //     the definition location of a symbol at a given text document position.
+   //
+   // Parameters:
+   //   params:
+   //
+   // Remarks:
+   //     Registration Options: TextDocumentRegistrationOptions
+   [JsonRpcMethod("textDocument/definition")]
+   protected virtual Result<LocationSingleOrArray, ResponseError> GotoDefinition(TextDocumentPositionParams @params)
+   {
+      throw new NotImplementedException();
+   }
+
+   //
+   // Summary:
+   //     The goto type definition request is sent from the client to the server to resolve
+   //     the type definition location of a symbol at a given text document position.
+   //
+   // Parameters:
+   //   params:
+   //
+   // Remarks:
+   //     Registration Options: TextDocumentRegistrationOptions
+   [JsonRpcMethod("textDocument/typeDefinition")]
+   protected virtual Result<LocationSingleOrArray, ResponseError> GotoTypeDefinition(TextDocumentPositionParams @params)
+   {
+      throw new NotImplementedException();
+   }
+
+   //
+   // Summary:
+   //     The goto implementation request is sent from the client to the server to resolve
+   //     the implementation location of a symbol at a given text document position.
+   //
+   // Parameters:
+   //   params:
+   //
+   // Remarks:
+   //     Registration Options: TextDocumentRegistrationOptions
+   [JsonRpcMethod("textDocument/implementation")]
+   protected virtual Result<LocationSingleOrArray, ResponseError> GotoImplementation(TextDocumentPositionParams @params)
+   {
+      throw new NotImplementedException();
+   }
+
+   //
+   // Summary:
+   //     The code action request is sent from the client to the server to compute commands
+   //     for a given text document and range.
+   //
+   // Parameters:
+   //   params:
+   //
+   // Remarks:
+   //     These commands are typically code fixes to either fix problems or to beautify/refactor
+   //     code. The result of a textDocument/codeAction request is an array of Command
+   //     literals which are typically presented in the user interface. When the command
+   //     is selected the server should be contacted again (via the workspace/executeCommand
+   //     request) to execute the command.
+   //
+   //     Since version 3.8.0: support for CodeAction literals to enable the following
+   //     scenarios:
+   //
+   //     • the ability to directly return a workspace edit from the code action request.
+   //     This avoids having another server roundtrip to execute an actual code action.
+   //     However server providers should be aware that if the code action is expensive
+   //     to compute or the edits are huge it might still be beneficial if the result is
+   //     simply a command and the actual edit is only computed when needed.
+   //     • the ability to group code actions using a kind. Clients are allowed to ignore
+   //     that information. However it allows them to better group code action for example
+   //     into corresponding menus (e.g. all refactor code actions into a refactor menu).
+   //
+   //
+   //     Clients need to announce their support for code action literals and code action
+   //     kinds via the corresponding client capability textDocument.codeAction.codeActionLiteralSupport.
+   //
+   //
+   //     Registration Options: TextDocumentRegistrationOptions
+   [JsonRpcMethod("textDocument/codeAction")]
+   protected virtual Result<CodeActionResult, ResponseError> CodeAction(CodeActionParams @params)
+   {
+      throw new NotImplementedException();
+   }
+
+   [JsonRpcMethod("textDocument/codeLens")]
+   protected virtual Result<CodeLens[], ResponseError> CodeLens(CodeLensParams @params)
+   {
+      throw new NotImplementedException();
+   }
+
+   [JsonRpcMethod("codeLens/resolve")]
+   protected virtual Result<CodeLens, ResponseError> ResolveCodeLens(CodeLens @params)
+   {
+      throw new NotImplementedException();
+   }
+
+   [JsonRpcMethod("textDocument/documentLink")]
+   protected virtual Result<DocumentLink[], ResponseError> DocumentLink(DocumentLinkParams @params)
+   {
+      throw new NotImplementedException();
+   }
+
+   [JsonRpcMethod("documentLink/resolve")]
+   protected virtual Result<DocumentLink, ResponseError> ResolveDocumentLink(DocumentLink @params)
+   {
+      throw new NotImplementedException();
+   }
+
+   [JsonRpcMethod("textDocument/rename")]
+   protected virtual Result<WorkspaceEdit, ResponseError> Rename(RenameParams @params)
+   {
+      throw new NotImplementedException();
+   }
+
+   //
+   // Summary:
+   //     The folding range request is sent from the client to the server to return all
+   //     folding ranges found in a given text document.
+   //
+   // Parameters:
+   //   params:
+   [JsonRpcMethod("textDocument/foldingRange")]
+   protected virtual Result<FoldingRange[], ResponseError> FoldingRange(FoldingRangeRequestParam @params)
+   {
+      throw new NotImplementedException();
+   }
+}
+#if false // Decompilation log
+'115' items in cache
+------------------
+Resolve: 'System.Runtime, Version=4.0.20.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a'
+Found single assembly: 'System.Runtime, Version=4.1.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a'
+WARN: Version mismatch. Expected: '4.0.20.0', Got: '4.1.2.0'
+Load from: 'C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.8\Facades\System.Runtime.dll'
+------------------
+Resolve: 'System.Threading.Tasks, Version=4.0.10.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a'
+Found single assembly: 'System.Threading.Tasks, Version=4.0.11.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a'
+WARN: Version mismatch. Expected: '4.0.10.0', Got: '4.0.11.0'
+Load from: 'C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.8\Facades\System.Threading.Tasks.dll'
+------------------
+Resolve: 'Matarillo.IO, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null'
+Found single assembly: 'Matarillo.IO, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null'
+Load from: 'G:\.packages\matarillo.io\1.0.0\lib\netstandard1.1\Matarillo.IO.dll'
+------------------
+Resolve: 'System.IO, Version=4.0.10.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a'
+Found single assembly: 'System.IO, Version=4.1.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a'
+WARN: Version mismatch. Expected: '4.0.10.0', Got: '4.1.2.0'
+Load from: 'C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.8\Facades\System.IO.dll'
+------------------
+Resolve: 'System.Diagnostics.Debug, Version=4.0.10.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a'
+Found single assembly: 'System.Diagnostics.Debug, Version=4.0.11.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a'
+WARN: Version mismatch. Expected: '4.0.10.0', Got: '4.0.11.0'
+Load from: 'C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.8\Facades\System.Diagnostics.Debug.dll'
+------------------
+Resolve: 'System.Reflection, Version=4.0.10.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a'
+Found single assembly: 'System.Reflection, Version=4.1.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a'
+WARN: Version mismatch. Expected: '4.0.10.0', Got: '4.1.2.0'
+Load from: 'C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.8\Facades\System.Reflection.dll'
+------------------
+Resolve: 'System.Collections, Version=4.0.10.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a'
+Found single assembly: 'System.Collections, Version=4.0.11.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a'
+WARN: Version mismatch. Expected: '4.0.10.0', Got: '4.0.11.0'
+Load from: 'C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.8\Facades\System.Collections.dll'
+------------------
+Resolve: 'System.Threading, Version=4.0.10.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a'
+Found single assembly: 'System.Threading, Version=4.0.11.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a'
+WARN: Version mismatch. Expected: '4.0.10.0', Got: '4.0.11.0'
+Load from: 'C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.8\Facades\System.Threading.dll'
+------------------
+Resolve: 'System.Dynamic.Runtime, Version=4.0.10.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a'
+Found single assembly: 'System.Dynamic.Runtime, Version=4.0.11.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a'
+WARN: Version mismatch. Expected: '4.0.10.0', Got: '4.0.11.0'
+Load from: 'C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.8\Facades\System.Dynamic.Runtime.dll'
+------------------
+Resolve: 'Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed'
+Found single assembly: 'Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed'
+WARN: Version mismatch. Expected: '10.0.0.0', Got: '13.0.0.0'
+Load from: 'G:\.packages\newtonsoft.json\13.0.3\lib\net45\Newtonsoft.Json.dll'
+------------------
+Resolve: 'System.Console, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a'
+Found single assembly: 'System.Console, Version=4.0.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a'
+WARN: Version mismatch. Expected: '4.0.0.0', Got: '4.0.2.0'
+Load from: 'C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.8\Facades\System.Console.dll'
+------------------
+Resolve: 'System.Text.Encoding, Version=4.0.10.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a'
+Found single assembly: 'System.Text.Encoding, Version=4.0.11.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a'
+WARN: Version mismatch. Expected: '4.0.10.0', Got: '4.0.11.0'
+Load from: 'C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.8\Facades\System.Text.Encoding.dll'
+------------------
+Resolve: 'System.Reflection.Extensions, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a'
+Found single assembly: 'System.Reflection.Extensions, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a'
+WARN: Version mismatch. Expected: '4.0.0.0', Got: '4.0.1.0'
+Load from: 'C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.8\Facades\System.Reflection.Extensions.dll'
+------------------
+Resolve: 'System.Linq, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a'
+Found single assembly: 'System.Linq, Version=4.1.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a'
+WARN: Version mismatch. Expected: '4.0.0.0', Got: '4.1.2.0'
+Load from: 'C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.8\Facades\System.Linq.dll'
+------------------
+Resolve: 'mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'
+Found single assembly: 'mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'
+Load from: 'C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.8\mscorlib.dll'
+------------------
+Resolve: 'System.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'
+Found single assembly: 'System.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'
+Load from: 'C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.8\System.Core.dll'
+------------------
+Resolve: 'System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'
+Found single assembly: 'System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'
+Load from: 'C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.8\System.dll'
+------------------
+Resolve: 'System.ComponentModel.Composition, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'
+Could not find by name: 'System.ComponentModel.Composition, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'
+------------------
+Resolve: 'System.Runtime.InteropServices, Version=1.3.0.0, Culture=neutral, PublicKeyToken=null'
+Found single assembly: 'System.Runtime.InteropServices, Version=4.1.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a'
+WARN: Version mismatch. Expected: '1.3.0.0', Got: '4.1.2.0'
+Load from: 'C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.8\Facades\System.Runtime.InteropServices.dll'
+------------------
+Resolve: 'System.Runtime.CompilerServices.Unsafe, Version=1.3.0.0, Culture=neutral, PublicKeyToken=null'
+Could not find by name: 'System.Runtime.CompilerServices.Unsafe, Version=1.3.0.0, Culture=neutral, PublicKeyToken=null'
+#endif
